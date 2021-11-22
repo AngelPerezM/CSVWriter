@@ -113,6 +113,7 @@ class CSVWriter
         bool writeToFile(const std::string& filename, bool append){
             std::ofstream file;
             bool appendNewLine = false;
+	        bool success = false;
             if (append) {
                 //check if last char of the file is newline
                 std::ifstream fin;
@@ -124,8 +125,7 @@ class CSVWriter
                         appendNewLine = true;
                 }
                 file.open(filename.c_str(), std::ios::out | std::ios::app);
-            }
-            else {
+            } else {
                 file.open(filename.c_str(), std::ios::out | std::ios::trunc);
             }
             if(!file.is_open())
@@ -134,7 +134,13 @@ class CSVWriter
                 file << std::endl;
             file << this->toString();
             file.close();
-            return file.good();
+            success = file.good();
+
+            if (success) {
+                this->ss.str("");
+                this->firstRow = true;
+            }
+            return success;
         }
 
         void enableAutoNewRow(int numberOfColumns){
